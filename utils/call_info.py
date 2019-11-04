@@ -33,7 +33,6 @@ class Call:
             self.state = CallState(val + 1)
         except ValueError:
             logging.error('Call state is over.')
-            pass
 
     def is_last_state(self):
         if self.state.value == len(list(CallState)):

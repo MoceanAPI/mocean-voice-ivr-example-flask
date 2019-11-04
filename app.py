@@ -1,5 +1,4 @@
 import logging
-import json
 
 from flask import Flask, Response, request, jsonify
 from utils.mccc_gen import ivr_init, ivr_check
@@ -39,7 +38,7 @@ def collect_mccc():
         logging.debug(f'call-uuid[{call_uuid}] added into calls dict')
         return jsonify(ivr_init(call))
     elif call_uuid in call_ended:
-        # If the call has ended and still collect-mccc request,
+        # If the call has ended but still requesting collect-mccc,
         # it is unprocessable
         return Response('[]', status=422, mimetype='application/json')
     else:
@@ -48,6 +47,7 @@ def collect_mccc():
         if del_call:
             logging.debug(f'Deleting call-uuid[{call_uuid}] from calls dict')
             del calls[call_uuid]
+            call_ended.append(call_uuid)
         return jsonify(res)
 
 
@@ -61,16 +61,14 @@ def inbound_mccc():
     destination = request.form.get('mocean-to')
     source = request.form.get('mocean-from')
 
-    logging.info(f'### Call received from [{source}], \
-                assigned call-uuid[{call_uuid}] ###')
+    logging.info(f'### Call received from [{source}], assigned call-uuid[{call_uuid}] ###')  # nopep8
     host = request.headers['Host']
 
     if call_uuid in calls:
-        logging.warning(f'call-uuid[{call_uuid}] is in calls, \
-            should use `voice/collect-mccc\' path')
+        logging.warning(f'call-uuid[{call_uuid}] is in calls, should use `voice/collect-mccc\' path')  # nopep8
         call = calls[call_uuid]
     elif call_uuid in call_ended:
-        # If the call has ended and still inbound-mccc request,
+        # If the call has ended but still requesting inbound-mccc,
         # it is unprocessable
         return Response('[]', status=422, mimetype='application/json')
     else:
@@ -81,8 +79,8 @@ def inbound_mccc():
     del_call, res = ivr_init(call)
     if del_call:
         logging.debug(f'Deleting call-uuid[{call_uuid}] from calls dict')
-        call_ended.append(call)
         del calls[call_uuid]
+        call_ended.append(call_uuid)
     return jsonify(res)
 
 
@@ -92,7 +90,7 @@ def call_status():
       Route received for webhook about call
     """
 
-    if call_uuid in request.args.items():
+    if 'mocean-call-uuid' in request.args.items():
         call_uuid = request.form.get('mocean-call-uuid')
         logging.info(f'### Call status received [{call_uuid}] ###')
         for k, v in request.args.items():

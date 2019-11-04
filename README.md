@@ -1,24 +1,39 @@
 # Mocean Voice IVR Example
 
-An example for voice IVR written in Flask using MoceanSDK. 
+An example for Interactive Voice Response (IVR) written in Python using Flask and MoceanSDK. This simple IVR will showcase how a developer can perform the following action using our programmable voice service:
+  1. Record an entire conversation
+  2. Use the Text-To-Speech(TTS) system to generate and play synthesised speech
+  3. Obtain inputs from user for further processing
+  4. Saving the state of a user's chosen path for further processing
 
-**Note:** This is an example of how to use the IVR. You might need to host to where it is accessible to the internet.
+The flow diagram for this sample IVR are as follow:
 
-# Requirements
-- Python 3.4 or above
+![flow_diagram](./docs/ivr_flow.svg)
 
-# Installations
 
-Run the following statement to install required packages in the working directory:
+## Requirements
+  - Python 3.4 or above
+
+## Installations
+If you haven't cloned the repo, clone it by:
+```sh
+git clone git@github.com:MoceanAPI/mocean-voice-ivr-example-flask.git
 ```
+Or if you do not want to setup a github account and setup SSH key:
+```sh
+git clone https://github.com/MoceanAPI/mocean-voice-ivr-example-flask.git
+```
+Or you can download the ZIP version and extract it.
+
+Change your working directory to the repo by `cd mocean-voice-ivr-example-flask`, and run the following statement to install required packages in the working directory:
+```sh
 pip install -r requirement.txt
 ```
 
-# Usage
+## Usage
 Start the application using the following command in the working directory:
 ```
 python3 app.py
 ```
 
-# TODO:
-- Check for invalid inputs
+**Note:** This is an example of how to create an IVR based on Mocean Voice GW. You might need to host to where it is accessible from the internet. If your server is setup behind a firewall, we recommend [ngrok](https://ngrok.com/) as a temporary measure to test the effectiveness of your application.

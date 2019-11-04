@@ -45,7 +45,7 @@ def ivr_get_language(digit, call):
     english_say_action = Mccc.say('Would you like to listen to some music? Press any key to proceed.')  # nopep8
     chinese_say_action = Mccc.say('你想听听音乐吗？若想，请按任意一键').set_language('cmn-CN')  # nopep8
     english_say_action_proceed = Mccc.say('I would assume you picked English as we did not receive anything.')  # nopep8
-    english_say_action_warning = Mccc.say('You did not pressed any valid key, we will end the conversation now.')  # nopep8
+    # english_say_action_warning = Mccc.say('You did not pressed any valid key, we will end the conversation now.')  # nopep8
 
     collect_action = Mccc.collect(f'http://{call.host}/voice/collect-mccc')
     collect_action.set_minimum(1).set_maximum(1).set_timeout(5000)

@@ -1,5 +1,6 @@
-#
-#
+##
+# Informations for calls, state and language
+##
 from enum import Enum
 import logging
 
@@ -7,7 +8,6 @@ class CallState(Enum):
     CALL_INIT = 1
     CALL_OBTAIN_LANGUAGE = 2
     CALL_GET_CONSENT = 3
-    CALL_PLAY_FILE = 4
 
 class LanguageChoice(Enum):
     LANG_EN_US = 1
@@ -33,7 +33,7 @@ class Call:
             pass
 
     def is_last_state(self):
-        if self.value == len(list(CallState)):
+        if self.state.value == len(list(CallState)):
             return True
         else:
             return False

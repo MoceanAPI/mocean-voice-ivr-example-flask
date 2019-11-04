@@ -1,3 +1,6 @@
+##
+# Handling call state, building MCCC and returns 
+##
 from moceansdk import McccBuilder, Mccc
 import logging
 from .call_info import CallState, LanguageChoice
@@ -13,11 +16,13 @@ def ivr_init(call):
     """
     Returns MCCC JSON when it first initialised
     """
+    # Create mccc actions
     record_action = Mccc.record()
     english_say_action = Mccc.say('Welcome to Mocean Voice IVR. For English, please press 1.')
     chinese_say_action = Mccc.say('中文请按二').set_language('cmn-CN')
     collect_action = Mccc.collect(f'http://{call.host}/voice/collect-mccc').set_minimum(1).set_maximum(1).set_timeout(5000)
 
+    # Adding mccc actions into mccc
     mccc = McccBuilder().add(record_action).add(english_say_action).add(chinese_say_action).add(collect_action)
     return False, mccc.build()
 
@@ -96,10 +101,12 @@ def ivr_check(digit, call):
     elif call.state == CallState.CALL_OBTAIN_LANGUAGE:
         mccc = ivr_play(digit, call)
         call.next_state()
-        is_del_call = True
     else:
         mccc = ivr_end(call)
         is_del_call = True
 
+    if not is_del_call:
+        # Checks if it is the last state, if it is, delete call
+        is_del_call = call.is_last_state()
     return is_del_call, mccc.build()
 

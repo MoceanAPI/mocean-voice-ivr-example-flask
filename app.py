@@ -11,6 +11,9 @@ calls = {}
 call_ended = []
 
 def invalid_response():
+    """
+    Wrapper for returning invalid response
+    """
     return Response('{"status": "Invalid request"}', status=400, mimetype='application/json')
 
 @app.route('/voice/collect-mccc', methods=['POST'])
@@ -28,11 +31,12 @@ def collect_mccc():
         call = Call(session_uuid, call_uuid, None, None, host)
         calls[call_uuid] = call
         logging.debug(f'call-uuid[{call_uuid}] added into calls dict')
-        # return Response(ret, status=200, mimetype='application/json')
         return jsonify(ivr_init(call))
+    elif call_uuid in call_ended:
+        # If the call has ended and still collect-mccc request, it is unprocessable
+        return Response('[]', status=422, mimetype='application/json')
     else:
         call = calls[call_uuid]
-        # return Response(ret, status=200, mimetype='application/json')
         del_call, res = ivr_check(digits, call)
         if del_call:
             logging.debug(f'Deleting call-uuid[{call_uuid}] from calls dict')
@@ -56,6 +60,9 @@ def inbound_mccc():
     if call_uuid in calls:
         logging.warning(f'call-uuid[{call_uuid}] is in calls, should use `voice/collect-mccc\' path')
         call = calls[call_uuid]
+    elif call_uuid in call_ended:
+        # If the call has ended and still inbound-mccc request, it is unprocessable
+        return Response('[]', status=422, mimetype='application/json')
     else:
         call = Call(session_uuid, call_uuid, source, destination, host)
         calls[call_uuid] = call
@@ -73,21 +80,16 @@ def call_status():
     """
         Route received for webhook about call 
     """
-    session_uuid = request.form.get('mocean-session-uuid')
-    call_uuid = request.form.get('mocean-call-uuid')
-    destination = request.form.get('mocean-to')
-    source = request.form.get('mocean-from')
-    direction = request.form.get('mocean-direction')
 
-    logging.info(f'### Call status received [{call_uuid}] ###')
-    logging.info(f'\tcall-uuid:{call_uuid}')
-    logging.info(f'\tsession-uuid:{session_uuid}')
-    logging.info(f'\tsource number:{source}')
-    logging.info(f'\tdestination number:{destination}')
-    logging.info(f'\tcall direction{direction}\n')
-
-    return Response('', status=204, mimetype='text/plain')
+    if call_uuid in request.args.items():
+        call_uuid = request.form.get('mocean-call-uuid')
+        logging.info(f'### Call status received [{call_uuid}] ###')
+        for k,v in request.args.items():
+            logging.debug(f'\t{k}:{v}')
+        return Response('', status=204, mimetype='text/plain')
+    else:
+        return invalid_response()
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port='5000')

@@ -1,1 +1,2 @@
-Flask
+flask
+git+https://github.com/MoceanAPI/mocean-sdk-python.git@voice#egg=moceansdk

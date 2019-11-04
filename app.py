@@ -8,12 +8,16 @@ from utils.call_info import Call
 app = Flask(__name__)
 
 calls = {}
+call_ended = []
 
 def invalid_response():
     return Response('{"status": "Invalid request"}', status=400, mimetype='application/json')
 
 @app.route('/voice/collect-mccc', methods=['POST'])
 def collect_mccc():
+    """
+        Route received when using `collect` parameters from our MoceanVoice GW
+    """
     session_uuid = request.form.get('mocean-session-uuid')
     call_uuid = request.form.get('mocean-call-uuid')
     digits = request.form.get('mocean-digits')
@@ -29,12 +33,18 @@ def collect_mccc():
     else:
         call = calls[call_uuid]
         # return Response(ret, status=200, mimetype='application/json')
-        res = jsonify(ivr_check(digits, call))
-        return res
+        del_call, res = ivr_check(digits, call)
+        if del_call:
+            logging.debug(f'Deleting call-uuid[{call_uuid}] from calls dict')
+            del calls[call_uuid]
+        return jsonify(res)
 
 
 @app.route('/voice/inbound-mccc', methods=['POST'])
 def inbound_mccc():
+    """
+        Route received when an inbound call is received from our MoceanVoice GW
+    """
     session_uuid = request.form.get('mocean-session-uuid')
     call_uuid = request.form.get('mocean-call-uuid')
     destination = request.form.get('mocean-to')
@@ -44,18 +54,25 @@ def inbound_mccc():
     host = request.headers['Host']
 
     if call_uuid in calls:
-        logging.warning(f'call-uuid[{call_uuid}] is in calls, should not use `voice/inbound-mccc\' path')
+        logging.warning(f'call-uuid[{call_uuid}] is in calls, should use `voice/collect-mccc\' path')
         call = calls[call_uuid]
     else:
         call = Call(session_uuid, call_uuid, source, destination, host)
         calls[call_uuid] = call
         logging.debug(f'call-uuid[{call_uuid}] added into calls dict')
 
-    ret = ivr_init(call)
-    return jsonify(ret)
+    del_call, res = ivr_init(call)
+    if del_call:
+        logging.debug(f'Deleting call-uuid[{call_uuid}] from calls dict')
+        call_ended.append(call)
+        del calls[call_uuid]
+    return jsonify(res)
 
 @app.route('/voice/call-status', methods=['POST'])
 def call_status():
+    """
+        Route received for webhook about call 
+    """
     session_uuid = request.form.get('mocean-session-uuid')
     call_uuid = request.form.get('mocean-call-uuid')
     destination = request.form.get('mocean-to')

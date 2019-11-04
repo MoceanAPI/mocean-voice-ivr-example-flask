@@ -1,4 +1,5 @@
 from moceansdk import McccBuilder, Mccc
+import logging
 from .call_info import CallState, LanguageChoice
 
 def is_digit(s):
@@ -18,7 +19,7 @@ def ivr_init(call):
     collect_action = Mccc.collect(f'http://{call.host}/voice/collect-mccc').set_minimum(1).set_maximum(1).set_timeout(5000)
 
     mccc = McccBuilder().add(record_action).add(english_say_action).add(chinese_say_action).add(collect_action)
-    return mccc.build()
+    return False, mccc.build()
 
 def ivr_get_language(digit, call):
     """
@@ -78,25 +79,27 @@ def ivr_play(digit, call):
 
     return mccc
 
-def ivr_end():
-    pass
+def ivr_end(call):
+    # Creates empty mccc and delete call, this should end the call on Mocean VoiceGW
+    logging.error(f'Call state should have ended on CALL_GET_CONSENT, current callstate: {call.state}')
+    return McccBuilder()
 
 def ivr_check(digit, call):
     """
     Sends relative MCCC for its respective digits pressed depending on the call state
     """
+    is_del_call = False
+
     if call.state == CallState.CALL_INIT:
         mccc = ivr_get_language(digit, call)
         call.next_state()
     elif call.state == CallState.CALL_OBTAIN_LANGUAGE:
         mccc = ivr_play(digit, call)
         call.next_state()
-    elif call.CallState == CallState.CALL_PLAY_FILE:
-        mccc = ivr_end()
-        call.next_state()
-
-    if mccc is not None:
-        return mccc.build()
+        is_del_call = True
     else:
-        return '[]'
+        mccc = ivr_end(call)
+        is_del_call = True
+
+    return is_del_call, mccc.build()
 

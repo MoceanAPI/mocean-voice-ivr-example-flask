@@ -4,15 +4,18 @@
 from enum import Enum
 import logging
 
+
 class CallState(Enum):
     CALL_INIT = 1
     CALL_OBTAIN_LANGUAGE = 2
     CALL_GET_CONSENT = 3
 
+
 class LanguageChoice(Enum):
     LANG_EN_US = 1
     LANG_EN_GB = 2
     LANG_CNM_CN = 3
+
 
 class Call:
     def __init__(self, session_uuid, call_uuid, source, destination, host):

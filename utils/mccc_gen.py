@@ -48,7 +48,9 @@ def ivr_get_language(digit, call):
     # english_say_action_warning = Mccc.say('You did not pressed any valid key, we will end the conversation now.')  # nopep8
 
     collect_action = Mccc.collect(f'http://{call.host}/voice/collect-mccc')
-    collect_action.set_minimum(1).set_maximum(1).set_timeout(5000)
+    collect_action.set_minimum(1).set_maximum(2).set_timeout(5000)
+    # set a random character to avoid default '#' character termination
+    collect_action.set_terminators('x')
 
     if is_digit(digit):
         # Convert input string into number
@@ -84,7 +86,7 @@ def ivr_play(digit, call):
     chinese_reject_say_action = Mccc.say('那再见啦！').set_language('cmn-CN')
     play_action = Mccc.play('https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3')  # nopep8
 
-    if digit is not None and len(digit) > 0:
+    if digit is not None and len(digit) >= 2:
         mccc.add(play_action)
     else:
         if call.language == LanguageChoice.LANG_CNM_CN:
@@ -110,6 +112,7 @@ def ivr_check(digit, call):
     """
     is_del_call = False
 
+    # logging.debug(f'>>>>>>> digit[{digit}]')
     if call.state == CallState.CALL_INIT:
         mccc = ivr_get_language(digit, call)
         call.next_state()

@@ -4,6 +4,7 @@ from flask import Flask, Response, request, jsonify
 from utils.mccc_gen import ivr_init, ivr_check
 from utils.call_info import Call
 
+logging.basicConfig(format='[%(asctime)s] - %(message)s', level=logging.DEBUG)
 app = Flask(__name__)
 
 calls = {}
@@ -101,5 +102,4 @@ def call_status():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
     app.run(debug=True, host='0.0.0.0', port='5000')

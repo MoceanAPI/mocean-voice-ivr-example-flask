@@ -10,9 +10,8 @@ The flow diagram for this sample IVR are as follow:
 
 ![flow_diagram](./docs/ivr_flow.svg)
 
-
 ## Requirements
-  - Python 3.4 or above
+- Python 3.6 or above
 
 ## Installations
 If you haven't cloned the repo, clone it by:
@@ -27,7 +26,7 @@ Or you can download the ZIP version and extract it.
 
 Change your working directory to the repo by `cd mocean-voice-ivr-example-flask`, and run the following statement to install required packages in the working directory:
 ```sh
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 ## Usage

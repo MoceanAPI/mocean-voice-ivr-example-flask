@@ -86,7 +86,7 @@ def ivr_play(digit, call):
     chinese_reject_say_action = Mccc.say('那再见啦！').set_language('cmn-CN')
     play_action = Mccc.play('https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3')  # nopep8
 
-    if digit is not None and len(digit) >= 2:
+    if digit is not None and len(digit) > 0:
         mccc.add(play_action)
     else:
         if call.language == LanguageChoice.LANG_CNM_CN:

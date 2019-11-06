@@ -1,6 +1,6 @@
 # Mocean Voice IVR Example
 
-An example for Interactive Voice Response (IVR) written in Python using Flask and MoceanSDK. This simple IVR will showcase how a developer can perform the following action using our programmable voice service:
+An example for Interactive Voice Response (IVR) written in Python using Flask and MoceanSDK. This simple IVR will showcase how a developer can perform the following actions using our programmable voice service:
   1. Record an entire conversation
   2. Use the Text-To-Speech(TTS) system to generate and play synthesised speech
   3. Obtain inputs from user for further processing
@@ -11,7 +11,8 @@ The flow diagram for this sample IVR are as follow:
 ![flow_diagram](./docs/ivr_flow.svg)
 
 ## Requirements
-- Python 3.6 or above
+-  Python 3.6 or above
+-  pip
 
 ## Installations
 If you haven't cloned the repo, clone it by:
@@ -24,13 +25,13 @@ git clone https://github.com/MoceanAPI/mocean-voice-ivr-example-flask.git
 ```
 Or you can download the ZIP version and extract it.
 
-Change your working directory to the repo by `cd mocean-voice-ivr-example-flask`, and run the following statement to install required packages in the working directory:
+Change your working directory to the repo by `cd mocean-voice-ivr-example-flask`, and run the following statement to install required packages:
 ```sh
 pip install -r requirements.txt
 ```
 
 ## Usage
-Start the application using the following command in the working directory:
+Start the application using the following command:
 ```
 python3 app.py
 ```

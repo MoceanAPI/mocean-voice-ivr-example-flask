@@ -22,7 +22,7 @@ def invalid_response():
         )
 
 
-@app.route('/voice/collect-mccc', methods=['POST'])
+@app.route('/voice/collect-command', methods=['POST'])
 def collect_mccc():
     """
       Route received when using `collect` parameters from our MoceanVoice GW
@@ -52,7 +52,7 @@ def collect_mccc():
         return jsonify(res)
 
 
-@app.route('/voice/inbound-mccc', methods=['POST'])
+@app.route('/voice/inbound-command', methods=['POST'])
 def inbound_mccc():
     """
       Route received when an inbound call is received from our MoceanVoice GW

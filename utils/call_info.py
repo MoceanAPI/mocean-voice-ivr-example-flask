@@ -35,10 +35,7 @@ class Call:
             logging.error('Call state is over.')
 
     def is_last_state(self):
-        if self.state.value == len(list(CallState)):
-            return True
-        else:
-            return False
+        return self.state.value == len(list(CallState))
 
     def set_language(self, lang):
         self.language = lang

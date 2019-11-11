@@ -1,6 +1,6 @@
 import logging
 
-from flask import Flask, Response, request, jsonify
+from flask import Flask, Response, request, jsonify, send_from_directory
 from utils.mccc_gen import ivr_init, ivr_check
 from utils.call_info import Call
 
@@ -20,6 +20,14 @@ def invalid_response():
         status=400,
         mimetype='application/json'
         )
+
+
+@app.route('/audio/<path:path>', methods=['GET'])
+def get_audio(path):
+    """
+      Serving static files from audio/ folder
+    """
+    return send_from_directory('audio', path)
 
 
 @app.route('/voice/collect-command', methods=['POST'])

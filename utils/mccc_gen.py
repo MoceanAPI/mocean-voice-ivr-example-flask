@@ -16,12 +16,13 @@ def is_digit(s):
 
 def ivr_init(call):
     """
-    Returns MCCC JSON when it first initialised
+    Returns mocean command JSON when it first initialised
     """
-    # Create mocean_command actions
+    # Create mocean commands for say action
     record_action = Mc.record()
     english_say_action = Mc.say('Welcome to Mocean Voice IVR. For English, please press 1.').set_barge_in(True)  # nopep8
     chinese_say_action = Mc.say('中文请按二').set_language('cmn-CN').set_barge_in(True)  # nopep8
+    # Create mocean command for collect
     collect_action = Mc.collect(f'http://{call.host}/voice/collect-command')
     collect_action.set_minimum(1).set_maximum(1).set_timeout(5000)
 
@@ -37,19 +38,24 @@ def ivr_init(call):
 
 def ivr_get_language(digit, call):
     """
-    Returns an mocean_command object for 2nd phase of IVR
+    Returns an Mc object for 2nd phase of IVR
     """
 
-    # Define an mocean_command builder
+    # Define a mocean command builder
     mocean_command = McBuilder()
-    # Create mocean_command actions
+    # Create mocean commands for say action
     english_say_action = Mc.say('Would you like to listen to some music? Press any key to proceed.').set_barge_in(True)  # nopep8
     chinese_say_action = Mc.say('你想听听音乐吗？若想，请按任意一键').set_language('cmn-CN').set_barge_in(True)  # nopep8
     english_say_action_proceed = Mc.say('Invalid input, we would assume you have picked English').set_barge_in(True)  # nopep8
-    # english_say_action_warning = Mc.say('You did not pressed any valid key, we will end the conversation now.')  # nopep8
 
+    # Cleansing digit cache
+    english_say_action.set_clear_digit_cache(True)
+    chinese_say_action.set_clear_digit_cache(True)
+    english_say_action_proceed.set_clear_digit_cache(True)
+
+    # Create mocean command for collect
     collect_action = Mc.collect(f'http://{call.host}/voice/collect-command')
-    collect_action.set_minimum(1).set_maximum(2).set_timeout(5000)
+    collect_action.set_minimum(1).set_maximum(1).set_timeout(5000)
     # set a random character to avoid default '#' character termination
     collect_action.set_terminators('x')
 
@@ -81,11 +87,18 @@ def ivr_get_language(digit, call):
 
 
 def ivr_play(digit, call):
+    """
+    Returns an Mc object for playing an URL file, or saying bye statements
+    """
     mocean_command = McBuilder()
 
+    # Create mocean commands for say action
     english_reject_say_action = Mc.say('Ok bye!')
     chinese_reject_say_action = Mc.say('那再见啦！').set_language('cmn-CN')
-    play_action = Mc.play('https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3')  # nopep8
+
+    # Sample music from downloaded from:
+    # http://amachamusic.chagasi.com/music_konekonoosanpo.html
+    play_action = Mc.play(f'http://{call.host}/audio/konekonoosanpo.mp3')  # nopep8
 
     if digit is not None and len(digit) > 0:
         mocean_command.add(play_action)
@@ -108,12 +121,12 @@ def ivr_end(call):
 
 def ivr_check(digit, call):
     """
-      Sends relative MCCC for its respective digits pressed depending on
-      the call state
+      Sends relative mocean command for its respective digits pressed
+      depending on the call state
     """
     is_del_call = False
 
-    logging.debug(f'>>>>>>> digit[{digit}]')
+    # logging.debug(f'>>>>>>> digit[{digit}]')
     if call.state == CallState.CALL_INIT:
         mocean_command = ivr_get_language(digit, call)
         call.next_state()

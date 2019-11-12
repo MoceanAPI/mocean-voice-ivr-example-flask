@@ -16,7 +16,7 @@ def invalid_response():
       Wrapper for returning invalid response
     """
     return Response(
-        '{"status": "Invalid request"}',
+        '{"error": "Invalid request"}',
         status=400,
         mimetype='application/json'
         )
@@ -35,6 +35,9 @@ def collect_mccc():
     """
       Route received when using `collect` parameters from our MoceanVoice GW
     """
+    if 'mocean-call-uuid' not in request.form:
+        return invalid_response()
+
     session_uuid = request.form.get('mocean-session-uuid')
     call_uuid = request.form.get('mocean-call-uuid')
     digits = request.form.get('mocean-digits')
@@ -65,6 +68,10 @@ def inbound_mccc():
     """
       Route received when an inbound call is received from our MoceanVoice GW
     """
+
+    if 'mocean-call-uuid' not in request.form:
+        return invalid_response()
+
     session_uuid = request.form.get('mocean-session-uuid')
     call_uuid = request.form.get('mocean-call-uuid')
     destination = request.form.get('mocean-to')
@@ -99,11 +106,17 @@ def call_status():
       Route received for webhook about call
     """
 
-    if 'mocean-call-uuid' in request.args.items():
+    if 'mocean-call-uuid' in request.form:
         call_uuid = request.form.get('mocean-call-uuid')
         logging.info(f'### Call status received [{call_uuid}] ###')
-        for k, v in request.args.items():
-            logging.debug(f'\t{k}:{v}')
+        for k, v in request.form.items():
+            logging.info(f'\t{k}:{v}')
+
+        if request.form.get('mocean-call-uuid') in calls \
+                and request.form.get('mocean-status') == 'HANGUP':
+            logging.debug(f'Deleting call-uuid[{call_uuid}] from calls dict')
+            del calls[call_uuid]
+            call_ended.append(call_uuid)
         return Response('', status=204, mimetype='text/plain')
     else:
         return invalid_response()

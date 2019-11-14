@@ -11,8 +11,8 @@ The flow diagram for this sample IVR are as follow:
 ![flow_diagram](./docs/ivr_flow.svg)
 
 ## Requirements
--  Python 3.6 or above
--  pip
+-   Python 3.6 or above
+-   pip
 
 ## Installations
 If you haven't cloned the repo, clone it by:
@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 ## Usage
 Start the application using the following command:
-```
+```sh
 python3 app.py
 ```
 

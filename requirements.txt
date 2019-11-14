@@ -1,2 +1,2 @@
 flask
-git+https://github.com/MoceanAPI/mocean-sdk-python.git@voice#egg=moceansdk
+moceansdk >= 1.1.0

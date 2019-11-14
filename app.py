@@ -44,11 +44,12 @@ def collect_mccc():
     logging.info(f'### Collect MCCC received from [{call_uuid}] ###')
     host = request.headers['Host']
 
-    if call_uuid not in calls:
+    if call_uuid not in calls and call_uuid not in call_ended:
         call = Call(session_uuid, call_uuid, None, None, host)
         calls[call_uuid] = call
         logging.debug(f'call-uuid[{call_uuid}] added into calls dict')
-        return jsonify(ivr_init(call))
+        _, res = ivr_init(call)
+        return jsonify(res)
     elif call_uuid in call_ended:
         # If the call has ended but still requesting collect-mccc,
         # it is unprocessable

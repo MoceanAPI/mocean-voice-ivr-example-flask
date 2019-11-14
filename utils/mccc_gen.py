@@ -12,6 +12,8 @@ def is_digit(s):
         return True
     except ValueError:
         return False
+    except TypeError:
+        return False
 
 
 def ivr_init(call):
@@ -73,12 +75,18 @@ def ivr_get_language(digit, call):
         else:
             # Invalid input, but we should assume English and proceed
             mocean_command.add(english_say_action_proceed)
+            # Since english_say_action_proceed has cleared digit cache
+            # we should not clear digit cache for the subsequent actions
+            english_say_action.set_clear_digit_cache(False)
             mocean_command.add(english_say_action)
             call.set_language(LanguageChoice.LANG_EN_US)
         # Add a collect action for proceeding action
         mocean_command.add(collect_action)
     else:
         mocean_command.add(english_say_action_proceed)
+        # Since english_say_action_proceed has cleared digit cache
+        # we should not clear digit cache for the subsequent actions
+        english_say_action.set_clear_digit_cache(False)
         mocean_command.add(english_say_action)
         call.set_language(LanguageChoice.LANG_EN_US)
         # Add a collect action for proceeding action
